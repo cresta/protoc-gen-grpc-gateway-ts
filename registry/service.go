@@ -3,7 +3,7 @@ package registry
 import (
 	"fmt"
 
-	descriptorpb "github.com/golang/protobuf/protoc-gen-go/descriptor"
+	descriptorpb "github.com/golang/protobuf/protoc-gen-go/descriptor" // nolint: depguard
 	"google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 
@@ -23,14 +23,13 @@ func hasHTTPAnnotation(m *descriptorpb.MethodDescriptorProto) bool {
 	return getHTTPAnnotation(m) != nil
 }
 
-func getHTTPMethodPath(m *descriptorpb.MethodDescriptorProto) (method, path string) {
-	if !hasHTTPAnnotation(m) {
+// getHTTPMethodPathFromRule extracts HTTP method and path from an HttpRule.
+// Returns empty strings for unsupported patterns (e.g., CustomHttpPattern).
+func getHTTPMethodPathFromRule(rule *annotations.HttpRule) (method, path string) {
+	if rule == nil {
 		return "", ""
 	}
-
-	rule := getHTTPAnnotation(m)
-	pattern := rule.Pattern
-	switch pattern.(type) {
+	switch rule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		return "GET", rule.GetGet()
 	case *annotations.HttpRule_Post:
@@ -42,23 +41,51 @@ func getHTTPMethodPath(m *descriptorpb.MethodDescriptorProto) (method, path stri
 	case *annotations.HttpRule_Delete:
 		return "DELETE", rule.GetDelete()
 	default:
-		panic(fmt.Sprintf("unsupported HTTP method %T", pattern))
+		panic(fmt.Sprintf("unsupported HTTP method %T", rule.Pattern))
 	}
 }
 
-func getHTTPBody(m *descriptorpb.MethodDescriptorProto) *string {
-	if !hasHTTPAnnotation(m) {
+// getHTTPBodyFromRule extracts body from an HttpRule
+func getHTTPBodyFromRule(rule *annotations.HttpRule) *string {
+	if rule == nil {
 		return nil
 	}
 	empty := ""
-	rule := getHTTPAnnotation(m)
-	pattern := rule.Pattern
-	switch pattern.(type) {
+	switch rule.Pattern.(type) {
 	case *annotations.HttpRule_Get:
 		return &empty
 	default:
 		body := rule.GetBody()
 		return &body
+	}
+}
+
+// generateAdditionalBindingMethodName creates unique method name for additional bindings.
+// Uses a simple index-based suffix (e.g., MethodName$1, MethodName$2) to avoid
+// confusion when the base method name already contains an HTTP method reference.
+func generateAdditionalBindingMethodName(baseName string, bindingIndex int) string {
+	return fmt.Sprintf("%s$%d", baseName, bindingIndex+1)
+}
+
+// createMethodData is a helper to construct a data.Method with the given parameters.
+// This reduces duplication between primary method and additional binding creation.
+func createMethodData(name, url string, inputType, outputType string, isInputExternal, isOutputExternal bool, serverStreaming, clientStreaming bool, httpMethod string, body *string, comment string) *data.Method {
+	return &data.Method{
+		Name: name,
+		URL:  url,
+		Input: &data.MethodArgument{
+			Type:       inputType,
+			IsExternal: isInputExternal,
+		},
+		Output: &data.MethodArgument{
+			Type:       outputType,
+			IsExternal: isOutputExternal,
+		},
+		ServerStreaming: serverStreaming,
+		ClientStreaming: clientStreaming,
+		HTTPMethod:      httpMethod,
+		HTTPRequestBody: body,
+		Comment:         comment,
 	}
 }
 
@@ -102,37 +129,67 @@ func (r *Registry) analyseService(fileData *data.File, packageName string, fileN
 
 		httpMethod := "POST"
 		url := "/" + serviceURLPart + "/" + method.GetName()
+		var body *string
+		var rule *annotations.HttpRule
 		if hasHTTPAnnotation(method) {
-			hm, u := getHTTPMethodPath(method)
-			if hm != "" && u != "" {
+			rule = getHTTPAnnotation(method)
+			if hm, u := getHTTPMethodPathFromRule(rule); hm != "" && u != "" {
 				httpMethod = hm
 				url = u
 			}
+			body = getHTTPBodyFromRule(rule)
 		}
-		body := getHTTPBody(method)
 
-		methodData := &data.Method{
-			Name: method.GetName(),
-			URL:  url,
-			Input: &data.MethodArgument{
-				Type:       inputTypeFQName,
-				IsExternal: isInputTypeExternal,
-			},
-			Output: &data.MethodArgument{
-				Type:       outputTypeFQName,
-				IsExternal: isOutputTypeExternal,
-			},
-			ServerStreaming: method.GetServerStreaming(),
-			ClientStreaming: method.GetClientStreaming(),
-			HTTPMethod:      httpMethod,
-			HTTPRequestBody: body,
-			Comment:         commentInfo.GetSubComment(serviceDescriptorMethodFieldNumber, i).GetText(),
-		}
+		methodComment := commentInfo.GetSubComment(serviceDescriptorMethodFieldNumber, i).GetText()
+		methodData := createMethodData(
+			method.GetName(),
+			url,
+			inputTypeFQName,
+			outputTypeFQName,
+			isInputTypeExternal,
+			isOutputTypeExternal,
+			method.GetServerStreaming(),
+			method.GetClientStreaming(),
+			httpMethod,
+			body,
+			methodComment,
+		)
 
 		fileData.TrackPackageNonScalarType(methodData.Input)
 		fileData.TrackPackageNonScalarType(methodData.Output)
 
 		serviceData.Methods = append(serviceData.Methods, methodData)
+
+		// Process additional bindings
+		if rule != nil {
+			for bindingIndex, binding := range rule.GetAdditionalBindings() {
+				bindingHTTPMethod, bindingURL := getHTTPMethodPathFromRule(binding)
+				if bindingHTTPMethod == "" || bindingURL == "" {
+					continue
+				}
+				bindingBody := getHTTPBodyFromRule(binding)
+				bindingMethodName := generateAdditionalBindingMethodName(method.GetName(), bindingIndex)
+
+				additionalMethodData := createMethodData(
+					bindingMethodName,
+					bindingURL,
+					inputTypeFQName,
+					outputTypeFQName,
+					isInputTypeExternal,
+					isOutputTypeExternal,
+					method.GetServerStreaming(),
+					method.GetClientStreaming(),
+					bindingHTTPMethod,
+					bindingBody,
+					methodComment,
+				)
+
+				fileData.TrackPackageNonScalarType(additionalMethodData.Input)
+				fileData.TrackPackageNonScalarType(additionalMethodData.Output)
+
+				serviceData.Methods = append(serviceData.Methods, additionalMethodData)
+			}
+		}
 	}
 
 	fileData.Services = append(fileData.Services, serviceData)

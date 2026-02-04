@@ -174,5 +174,17 @@ service CounterService {
       get: "/path/query"
     };
   }
+  // Test additional_bindings feature - should generate multiple TypeScript methods
+  rpc HTTPGetWithAdditionalBindings(HttpGetRequest) returns (HttpGetResponse) {
+    option (google.api.http) = {
+      get: "/api/additional/{num_to_increase}"
+      additional_bindings: [ {
+        post: "/api/additional"
+        body: "*"
+      }, {
+        get: "/api/additional/v2/{num_to_increase}"
+      } ]
+    };
+  }
 }
 

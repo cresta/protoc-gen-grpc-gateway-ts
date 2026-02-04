@@ -107,3 +107,9 @@ func (r *RealCounterService) HTTPGetWithZeroValueURLSearchParams(ctx context.Con
 		},
 	}, nil
 }
+
+func (r *RealCounterService) HTTPGetWithAdditionalBindings(ctx context.Context, req *HttpGetRequest) (*HttpGetResponse, error) {
+	return &HttpGetResponse{
+		Result: req.NumToIncrease + 1,
+	}, nil
+}
