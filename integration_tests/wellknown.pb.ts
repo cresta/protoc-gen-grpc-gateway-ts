@@ -20,7 +20,7 @@ export type WellknownTypes = {
   struct?: unknown;
   listValue?: unknown[];
   nullValue?: null;
-  fieldMask?: string;
+  fieldMask?: string[];
   any?: unknown;
   empty?: {};
   status?: GoogleRpcStatus.Status;
