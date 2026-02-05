@@ -62,18 +62,26 @@ export type {{ .Name }} = {
 {{- end -}}
 {{- end -}}
 
+{{- define "methodName" -}}
+{{- if gt .BindingIndex 0 -}}
+{{.Name}}${{.BindingIndex}}
+{{- else -}}
+{{.Name}}
+{{- end -}}
+{{- end -}}
+
 {{- define "services" -}}
 {{- range . -}}
 {{- if .Comment }}
 {{.Comment }}
 {{- end }}
 export class Observable{{ .Name }} {
-{{ range .Methods }}  
+{{ range .Methods }}
 {{- if .Comment }}
 {{.Comment | indent 2 }}
 {{- end }}
 {{- if .ServerStreaming }}
-  static {{.Name}}(
+  static {{template "methodName" .}}(
     req: {{tsType .Input}},
     initReq?: fm.InitReq,
   ): Observable<{{tsType .Output}}> {
@@ -83,7 +91,7 @@ export class Observable{{ .Name }} {
     );
   }
 {{- else }}
-  static {{.Name}}(
+  static {{template "methodName" .}}(
     req: {{tsType .Input}},
     initReq?: fm.InitReq,
   ): Observable<{{tsType .Output}}> {
@@ -100,12 +108,12 @@ export class Observable{{ .Name }} {
 {{.Comment }}
 {{- end }}
 export class {{.Name}} {
-{{ range .Methods }}  
+{{ range .Methods }}
 {{- if .Comment }}
 {{.Comment | indent 2 }}
 {{- end }}
 {{- if .ServerStreaming }}
-  static {{.Name}}(
+  static {{template "methodName" .}}(
     req: {{tsType .Input}},
     entityNotifier?: fm.NotifyStreamEntityArrival<{{tsType .Output}}>,
     initReq?: fm.InitReq,
@@ -117,12 +125,12 @@ export class {{.Name}} {
     );
   }
 {{- else }}
-  static {{.Name}}(
+  static {{template "methodName" .}}(
     req: {{tsType .Input}},
     initReq?: fm.InitReq,
   ): Promise<{{tsType .Output}}> {
     return fm.fetchReq<{{tsType .Input}}, {{tsType .Output}}>(
-      `{{renderURL .}}`, 
+      `{{renderURL .}}`,
       {...initReq, {{buildInitReq .}}},
     );
   }

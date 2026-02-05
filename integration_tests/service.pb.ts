@@ -301,7 +301,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<UnaryResponse> {
     return fm.fetchReq<UnaryRequest, UnaryResponse>(
-      `/main.CounterService/Increment`, 
+      `/main.CounterService/Increment`,
       {...initReq, method: "POST", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -321,7 +321,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<UnaryResponse> {
     return fm.fetchReq<UnaryRequest, UnaryResponse>(
-      `/main.CounterService/FailingIncrement`, 
+      `/main.CounterService/FailingIncrement`,
       {...initReq, method: "POST", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -330,7 +330,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<BinaryResponse> {
     return fm.fetchReq<BinaryRequest, BinaryResponse>(
-      `/main.CounterService/EchoBinary`, 
+      `/main.CounterService/EchoBinary`,
       {...initReq, method: "POST", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -339,7 +339,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpGetResponse> {
     return fm.fetchReq<HttpGetRequest, HttpGetResponse>(
-      `/api/${req["numToIncrease"]}?${fm.renderURLSearchParams(req, ["numToIncrease"])}`, 
+      `/api/${req["numToIncrease"]}?${fm.renderURLSearchParams(req, ["numToIncrease"])}`,
       {...initReq, method: "GET"},
     );
   }
@@ -348,7 +348,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpGetResponse> {
     return fm.fetchReq<HttpGetRequest2, HttpGetResponse>(
-      `/api/${req["name"]}:hello?${fm.renderURLSearchParams(req, ["name"])}`, 
+      `/api/${req["name"]}:hello?${fm.renderURLSearchParams(req, ["name"])}`,
       {...initReq, method: "GET"},
     );
   }
@@ -357,7 +357,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpGetResponse> {
     return fm.fetchReq<HttpGetRequest3, HttpGetResponse>(
-      `/api/${req["rCamel"]["nameCamel"]}:hello?${fm.renderURLSearchParams(req, ["rCamel.nameCamel"])}`, 
+      `/api/${req["rCamel"]["nameCamel"]}:hello?${fm.renderURLSearchParams(req, ["rCamel.nameCamel"])}`,
       {...initReq, method: "GET"},
     );
   }
@@ -366,7 +366,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpPostResponse> {
     return fm.fetchReq<HttpPostRequest, HttpPostResponse>(
-      `/post/${req["a"]}?${fm.renderURLSearchParams(req, ["a", "req"])}`, 
+      `/post/${req["a"]}?${fm.renderURLSearchParams(req, ["a", "req"])}`,
       {...initReq, method: "POST", body: JSON.stringify(req["req"], fm.replacer)},
     );
   }
@@ -375,7 +375,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpPostResponse> {
     return fm.fetchReq<HttpPostRequest, HttpPostResponse>(
-      `/post/${req["a"]}/${req["c"]}`, 
+      `/post/${req["a"]}/${req["c"]}`,
       {...initReq, method: "POST", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -384,7 +384,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpPostResponse> {
     return fm.fetchReq<HttpPostRequest2, HttpPostResponse>(
-      `/post/${req["a"]}/${req["c"]}?${fm.renderURLSearchParams(req, ["a", "c", "reqCamel"])}`, 
+      `/post/${req["a"]}/${req["c"]}?${fm.renderURLSearchParams(req, ["a", "c", "reqCamel"])}`,
       {...initReq, method: "POST", body: JSON.stringify(req["reqCamel"], fm.replacer)},
     );
   }
@@ -393,7 +393,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpPostResponse> {
     return fm.fetchReq<HttpPostRequest2, HttpPostResponse>(
-      `/post/${req["a"]}/${req["c"]}?${fm.renderURLSearchParams(req, ["a", "c", "reqCamel.b"])}`, 
+      `/post/${req["a"]}/${req["c"]}?${fm.renderURLSearchParams(req, ["a", "c", "reqCamel.b"])}`,
       {...initReq, method: "POST", body: JSON.stringify(req["reqCamel"]["b"], fm.replacer)},
     );
   }
@@ -402,7 +402,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpPatchResponse> {
     return fm.fetchReq<HttpPatchRequest, HttpPatchResponse>(
-      `/patch`, 
+      `/patch`,
       {...initReq, method: "PATCH", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -411,7 +411,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<{}> {
     return fm.fetchReq<HttpDeleteRequest, {}>(
-      `/delete/${req["a"]}?${fm.renderURLSearchParams(req, ["a"])}`, 
+      `/delete/${req["a"]}?${fm.renderURLSearchParams(req, ["a"])}`,
       {...initReq, method: "DELETE"},
     );
   }
@@ -420,7 +420,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<Msg.ExternalResponse> {
     return fm.fetchReq<Msg.ExternalRequest, Msg.ExternalResponse>(
-      `/main.CounterService/ExternalMessage`, 
+      `/main.CounterService/ExternalMessage`,
       {...initReq, method: "POST", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -429,7 +429,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HTTPGetWithURLSearchParamsResponse> {
     return fm.fetchReq<HTTPGetWithURLSearchParamsRequest, HTTPGetWithURLSearchParamsResponse>(
-      `/api/query/${req["a"]}?${fm.renderURLSearchParams(req, ["a"])}`, 
+      `/api/query/${req["a"]}?${fm.renderURLSearchParams(req, ["a"])}`,
       {...initReq, method: "GET"},
     );
   }
@@ -438,7 +438,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HTTPGetWithZeroValueURLSearchParamsResponse> {
     return fm.fetchReq<HTTPGetWithZeroValueURLSearchParamsRequest, HTTPGetWithZeroValueURLSearchParamsResponse>(
-      `/path/query?${fm.renderURLSearchParams(req, [])}`, 
+      `/path/query?${fm.renderURLSearchParams(req, [])}`,
       {...initReq, method: "GET"},
     );
   }
@@ -450,7 +450,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpGetResponse> {
     return fm.fetchReq<HttpGetRequest, HttpGetResponse>(
-      `/api/additional/${req["numToIncrease"]}?${fm.renderURLSearchParams(req, ["numToIncrease"])}`, 
+      `/api/additional/${req["numToIncrease"]}?${fm.renderURLSearchParams(req, ["numToIncrease"])}`,
       {...initReq, method: "GET"},
     );
   }
@@ -462,7 +462,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpGetResponse> {
     return fm.fetchReq<HttpGetRequest, HttpGetResponse>(
-      `/api/additional`, 
+      `/api/additional`,
       {...initReq, method: "POST", body: JSON.stringify(req, fm.replacer)},
     );
   }
@@ -474,7 +474,7 @@ export class CounterService {
     initReq?: fm.InitReq,
   ): Promise<HttpGetResponse> {
     return fm.fetchReq<HttpGetRequest, HttpGetResponse>(
-      `/api/additional/v2/${req["numToIncrease"]}?${fm.renderURLSearchParams(req, ["numToIncrease"])}`, 
+      `/api/additional/v2/${req["numToIncrease"]}?${fm.renderURLSearchParams(req, ["numToIncrease"])}`,
       {...initReq, method: "GET"},
     );
   }
