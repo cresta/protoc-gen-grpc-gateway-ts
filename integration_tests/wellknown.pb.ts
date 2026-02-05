@@ -3,10 +3,9 @@
 /*
 * This file is a generated Typescript file for GRPC Gateway, DO NOT MODIFY
 */
-
 import { Observable } from 'rxjs';
-import * as GoogleRpcStatus from "./google/rpc/status.pb"
 
+import * as GoogleRpcStatus from "./google/rpc/status.pb";
 
 export enum AEnum {
   VALUE_0 = "VALUE_0",
@@ -21,8 +20,8 @@ export type WellknownTypes = {
   struct?: unknown;
   listValue?: unknown[];
   nullValue?: null;
-  fieldMask?: string[];
+  fieldMask?: string;
   any?: unknown;
   empty?: {};
   status?: GoogleRpcStatus.Status;
-}
+};

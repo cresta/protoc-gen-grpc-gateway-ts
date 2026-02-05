@@ -70,6 +70,8 @@ type Method struct {
 	HTTPRequestBody *string
 	// Comment is the comment of the Method
 	Comment string
+	// BindingIndex indicates the index of the HTTP binding (0 for primary, 1+ for additional_bindings)
+	BindingIndex int
 }
 
 // MethodArgument stores the type information about method argument
